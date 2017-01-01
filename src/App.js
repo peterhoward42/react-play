@@ -2,12 +2,34 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+class WordFilter extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { value: '' };
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({ value: event.target.value });
+  }
+
+  render() {
+    return (
+      <div>
+        <label>Filter:</label>
+        <input type="text" value={this.state.value} onChange={this.handleChange} />
+      </div>
+    );
+  }
+}
+
 
 function WordRow(props) {
   return (<div>{props.word}</div>);
 }
 
-function WorlList(props) {
+function WordList(props) {
   const listElements = props.listOfWords.map((word) =>
     <WordRow word={word} />
   );
@@ -18,7 +40,8 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <WorlList listOfWords={LIST_OF_WORDS} />
+        <WordFilter />
+        <WordList listOfWords={LIST_OF_WORDS} />
       </div>
     );
   }

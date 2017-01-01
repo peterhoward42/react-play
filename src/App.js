@@ -42,14 +42,25 @@ function WordList(props) {
   return <div>{listElements}</div>
 }
 
+/** An element that shows a toggle-page link and emits it being
+ * clicked.
+ */
+function TogglePageLink(props) {
+  return (<a href='#' onClick={props.clickSubscriber}>Toggle Page</a>);
+}
+
 /** The top level element that aggregates the main blocks of the UI.
  * Also owns the active filter string state, and its interpretation.
   */
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { filterString: "" }
+    this.state = {
+      filterString: "",
+      onMainPage: true
+    };
     this.handleFilterTextChanged = this.handleFilterTextChanged.bind(this);
+    this.handleTogglePage = this.handleTogglePage.bind(this);
   }
 
   /** A method that interprets the current state of the word filter, to provide
@@ -70,22 +81,29 @@ class App extends Component {
     this.setState({ filterString: evt.target.value });
   }
 
-  render() {
-    return (
-      <div className="App">
-        <WordFragmentInput
-          textToDisplay={this.state.filterString}
-          changeSubscriber={this.handleFilterTextChanged}
-          placeHolderText='Start typing...'
-          />
-        <WordList listOfWords={this.filteredWords()} />
-      </div>
-    );
+  handleTogglePage(evt) {
+    const toggle = !this.state.onMainPage;
+    this.setState({ onMainPage: toggle });
   }
 
-
+  render() {
+    if (this.state.onMainPage) {
+      return (
+        <div className="App">
+          <WordFragmentInput
+            textToDisplay={this.state.filterString}
+            changeSubscriber={this.handleFilterTextChanged}
+            placeHolderText='Start typing...'
+            />
+          <WordList listOfWords={this.filteredWords()} />
+          <TogglePageLink clickSubscriber={this.handleTogglePage} />
+        </div>
+      );
+    }
+    else {
+      return (<TogglePageLink clickSubscriber={this.handleTogglePage} />);
+    }
+  }
 }
-
-
 
 export default App;

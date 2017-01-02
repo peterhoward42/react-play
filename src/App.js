@@ -1,3 +1,7 @@
+/** A very simple DIY example of REACT usage.
+ * 
+ */
+
 import React, { Component } from 'react';
 import './App.css';
 
@@ -5,27 +9,22 @@ const IPSUM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do e
 
 const LIST_OF_WORDS = IPSUM.split(/\s/);
 
-/** An element where you can input the beginning of a word.
+/** An element where you can type in the beginning of a word.
  * Emits the characters you enter one at a time.
  * Holds no state of its own - you must provide the text you want
  * to be displayed for each render.
  */
-class WordFragmentInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.changeSubscriber = props.changeSubscriber;
-    this.placeHolderText = props.placeHolderText;
-  }
-
-  render() {
-    let textToDisplay = this.props.textToDisplay;
-    return (
-      <div>
-        <label>Filter:</label>
-        <input type="text" value={textToDisplay} placeholder={this.placeHolderText} onChange={this.changeSubscriber} />
-      </div>
-    );
-  }
+function WordFragmentInput(props) {
+  return (
+    <div>
+      <label>Filter:</label>
+      <input
+        type="text"
+        value={props.textToDisplay}
+        placeholder={props.placeHolderText}
+        onChange={props.changeSubscriber} />
+    </div>
+  );
 }
 
 /** An element that displays one line of text. */
@@ -49,18 +48,16 @@ function TogglePageLink(props) {
   return (<a href='#' onClick={props.clickSubscriber}>Toggle Page</a>);
 }
 
-/** The top level element that aggregates the main blocks of the UI.
- * Also owns the active filter string state, and its interpretation.
-  */
-class App extends Component {
+/** Renders the main page, and is responsible for the state and interpretation
+ * of word filtering.
+ */
+class MainPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filterString: "",
-      onMainPage: true
+      filterString: ""
     };
     this.handleFilterTextChanged = this.handleFilterTextChanged.bind(this);
-    this.handleTogglePage = this.handleTogglePage.bind(this);
   }
 
   /** A method that interprets the current state of the word filter, to provide
@@ -81,27 +78,55 @@ class App extends Component {
     this.setState({ filterString: evt.target.value });
   }
 
+  render() {
+    return (
+      <div>
+        <WordFragmentInput
+          textToDisplay={this.state.filterString}
+          changeSubscriber={this.handleFilterTextChanged}
+          placeHolderText='Start typing...'
+          />
+        <WordList listOfWords={this.filteredWords()} />
+        <TogglePageLink clickSubscriber={this.props.handleTogglePage} />
+      </div>
+    );
+  }
+}
+
+/** A trivial element that can be rendered as a whole page instead of the main one.
+ * Exists only to exercise conditional rendering of alternative views.
+ * Shows only the link to toggle the view back to the main page.
+ */
+function AlternativePage(props) {
+  return (<a href='#' onClick={props.handleTogglePage}>Toggle Page</a>);
+}
+
+/** The top level element that aggregates the choice of two pages and owns
+ * the state for which page is selected.
+  */
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      onMainPage: true
+    };
+    this.handleTogglePage = this.handleTogglePage.bind(this);
+  }
+
   handleTogglePage(evt) {
     const toggle = !this.state.onMainPage;
     this.setState({ onMainPage: toggle });
   }
 
+  /** The entry point render method. */
   render() {
     if (this.state.onMainPage) {
       return (
-        <div className="App">
-          <WordFragmentInput
-            textToDisplay={this.state.filterString}
-            changeSubscriber={this.handleFilterTextChanged}
-            placeHolderText='Start typing...'
-            />
-          <WordList listOfWords={this.filteredWords()} />
-          <TogglePageLink clickSubscriber={this.handleTogglePage} />
-        </div>
+        <MainPage handleTogglePage={this.handleTogglePage} />
       );
     }
     else {
-      return (<TogglePageLink clickSubscriber={this.handleTogglePage} />);
+      return (<AlternativePage handleTogglePage={this.handleTogglePage} />);
     }
   }
 }

@@ -131,4 +131,4 @@ class App extends Component {
   }
 }
 
-export {App, MainPage, WordRow};
+export {App, MainPage, AlternativePage, WordRow};

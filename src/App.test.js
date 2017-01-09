@@ -1,10 +1,14 @@
 // Illustrates some examples of testing using Jest
 
+// See also v good tutorial on TDD for react using enzyme here:
+// http://thereignn.ghost.io/a-step-by-step-tdd-approach-on-testing-react-components-using-enzyme/
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { App, MainPage, WordRow } from './App';
-//import renderer from 'react-test-renderer';
-//import { shallow } from 'enzyme';
+import { App, MainPage, AlternativePage, WordRow } from './App';
+import renderer from 'react-test-renderer';
+import { shallow, mount, render } from 'enzyme';
+
 
 // Start with plan js testing, i.e. not react specific
 
@@ -72,24 +76,30 @@ it('Exercises ReactDOM.render() to show a standard HTML element can be rendered 
   ReactDOM.render(element, wrapper);
 })
 
-it('Exercises ReactDOM.render() with a custom element to check it can be rendered without crashing', () => {
-  const div = document.createElement('div');
-  ReactDOM.render(<App />, div);
+// These shallow rendering tests I think are let you inspect the DOM created in
+// depth and detail.
+it('Exercises ReactDOM.render() to show a standard HTML element can be rendered without crashing', () => {
+  const wrapper = document.createElement('div');
+  const element = <p>foo</p>
+  ReactDOM.render(element, wrapper);
+})
+
+it('Exercises shallow.render() to render a component without needing a context, to show that it is not dependent on its children', () => {
+  const wrapper = shallow(<App />)
+  expect(wrapper.find(MainPage)).toHaveLength(1)
 })
 
 // Basic snapshot test demo
 
-// todo this not tried yet because don't have renderer installed
-/*
-
 it('Shows a very simple example of snapshot', () => {
-  const component=renderer.create(<App/>)
-  let tree=component.toJSON()
-  expect(tree.toMatchSnapshot())
+  const tree = renderer.create(
+    <App/>
+  ).toJSON() // seems this version of toJSON() gives the tree some functions too?
+  expect(tree).toMatchSnapshot()
   // stimulate change in state - tutorial says to do this by calling tree.props but cannot see how tree which is json can have a method, surely they maean component not tree?
-  expect(tree.toMatchSnapshot())
+  expect(tree).toMatchSnapshot()
 })
-*/
+
 
 
 
